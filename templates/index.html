@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Listener Segmentation</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 450px;
+            max-width: 90%;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background: #eef5ff;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎵 Music Listener Segmentation</h1>
+
+    <p class="subtitle">
+        Find your listening behavior segment using AI/ML
+    </p>
+
+    <label>Listening Hours Per Week</label>
+    <input type="number" id="listening_hours" step="0.1" min="0"
+           placeholder="Example: 20">
+
+    <label>Songs Per Day</label>
+    <input type="number" id="songs_per_day" step="0.1" min="0"
+           placeholder="Example: 30">
+
+    <label>Skip Rate</label>
+    <input type="number" id="skip_rate" step="0.01" min="0"
+           placeholder="Example: 0.15">
+
+    <label>Playlist Count</label>
+    <input type="number" id="playlist_count" min="0"
+           placeholder="Example: 8">
+
+    <button onclick="predictSegment()">
+        Predict Listener Segment
+    </button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+async function predictSegment() {
+
+    const listeningHours =
+        document.getElementById("listening_hours").value;
+
+    const songsPerDay =
+        document.getElementById("songs_per_day").value;
+
+    const skipRate =
+        document.getElementById("skip_rate").value;
+
+    const playlistCount =
+        document.getElementById("playlist_count").value;
+
+    if (!listeningHours || !songsPerDay || !skipRate || !playlistCount) {
+        alert("Please enter all values.");
+        return;
+    }
+
+    const response = await fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            listening_hours_per_week: listeningHours,
+            songs_per_day: songsPerDay,
+            skip_rate: skipRate,
+            playlist_count: playlistCount
+        })
+    });
+
+    const result = await response.json();
+
+    const resultBox = document.getElementById("result");
+
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML =
+        "<h2>Prediction Result</h2>" +
+        "<p><strong>Cluster:</strong> " + result.cluster + "</p>" +
+        "<p><strong>Listener Segment:</strong> " +
+        result.segment + "</p>";
+}
+</script>
+
+</body>
+</html>

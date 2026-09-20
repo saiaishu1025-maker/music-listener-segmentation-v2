@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import joblib
+from sklearn.metrics import silhouette_score
 
 # Load the dataset
 df = pd.read_csv("music_listeners.csv")
@@ -37,6 +38,17 @@ print(df[features + ["cluster"]])
 # Display cluster centers
 print("\nCluster Centers:")
 print(kmeans.cluster_centers_)
+print("\nCluster Interpretation:")
+print("\nCluster Counts:")
+print(pd.Series(kmeans.labels_).value_counts().sort_index())
+print("Cluster 0 - Music Explorers")
+print("Cluster 1 - Heavy Listeners")
+print("Cluster 2 - Casual Listeners")
+silhouette = silhouette_score(X_scaled, kmeans.labels_)
+
+print("\nModel Evaluation:")
+print("Inertia:", kmeans.inertia_)
+print("Silhouette Score:", silhouette)
 
 # Save the trained model
 joblib.dump(kmeans, "model.pkl")
